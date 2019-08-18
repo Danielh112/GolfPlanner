@@ -1,0 +1,143 @@
+@font-face {
+  font-family: Pangram;
+  src: url("../fonts/Pangram-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Pangram;
+  font-weight: 100;
+  src: url("../fonts/Pangram-Light.otf") format("opentype");
+}
+
+@font-face {
+  font-family: Pangram;
+  src: url("../fonts/Pangram-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-weight: bold;
+}
+
+html, body {
+  height: 100%;
+  width: 100%
+  font-family: Pangram, Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+/* class themes */
+.nav {
+  padding-bottom: 20px;
+  /*background-color: #A9B7CD; */
+}
+
+/* Calendar */
+#calendar {
+    width: 80%;
+    margin: auto;
+}
+
+.fc-left {
+  font-size: 12px;
+}
+
+.fc-button-primary {
+  font-size: 13px;
+}
+
+/* Default styles */
+.no-padding {
+    padding: 0px;
+}
+
+.padding-sm {
+  padding: 10px !important;
+}
+
+.padding-left-sm {
+  padding-left: 10px !important;
+}
+
+.padding-top-sm {
+  padding-top: 10px !important;
+}
+
+.padding-bottom-sm {
+  padding-top: 10px !important;
+}
+
+.padding-left-x-sm {
+  padding-left: 4px !important;
+}
+
+.padding-md {
+  padding: 15px !important;
+}
+
+.padding-left-md {
+  padding-left: 15px !important;
+}
+
+.padding-left-lg {
+  padding-left: 35px !important;
+}
+
+.padding-right-md {
+  padding-right: 15px !important;
+}
+
+.margin-left-sm {
+  margin-left: 10px !important;
+}
+
+.margin-right-sm {
+  margin-right: 10px !important;
+}
+
+.margin-top-sm {
+  margin-top: 10px !important;
+}
+
+.margin-bottom-sm {
+  margin-bottom: 10px !important;
+}
+
+.margin-top-md {
+  margin-top: 35px !important;
+}
+
+.margin-bottom-md {
+  margin-bottom: 35px !important;
+}
+
+.float-left {
+  float: left;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.w-80 {
+  width: 80%;
+}
+
+.w-50 {
+  width: 50%;
+}
