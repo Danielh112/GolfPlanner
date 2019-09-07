@@ -59,7 +59,16 @@ function getEvents(start, end) {
   });
 }
 
-function addEvent() {
+async function addEvent() {
+  const client = await processAddEvent();
+  const clientExists = await checkClientExists(client);
+  if (clientExists.rows.length == 0) {
+    addClient(client);
+    //Display add client modal
+  }
+}
+
+function processAddEvent() {
   formData = {};
 
   $.each($('#addEventForm').serializeArray(), function() {
@@ -68,24 +77,72 @@ function addEvent() {
 
   start = new Date(Date.parse(formData.eventDateInput + ':' + formData.startTimeInput)).toISOString();
   end = new Date(Date.parse(formData.eventDateInput + ':' + formData.endTimeInput)).toISOString();
-  $.ajax({
-    url: '../api/calendar/addEvent',
-    type: 'post',
-    data: {
-      title: formData.title,
-      lessonType: formData.lessonType,
-      start: start,
-      end: end
-    },
-    dataType: 'json',
-    success: function(response) {
-      return response;
-    },
-    error: function(err) {
-      console.log(err);
-    }
+
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: '../api/calendar/addEvent',
+      type: 'post',
+      data: {
+        eventType: formData.eventType,
+        fullName: formData.fullName,
+        start: start,
+        end: end
+      },
+      dataType: 'json',
+      success: function(response) {
+        formData['customerId'] = response.response.rows[0].customerid;
+        resolve(formData);
+      },
+      error: function(err) {
+        console.log(err);
+        reject(err);
+      }
+    });
   });
   $('#addEventModal').modal('hide');
+}
+
+function checkClientExists(client) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: '../api/clients',
+      type: 'get',
+      data: {
+        fullName: client.fullName,
+      },
+      dataType: 'json',
+      success: function(response) {
+        resolve(response);
+      },
+      error: function(err) {
+        console.log(err);
+        reject(err);
+      }
+    });
+  });
+}
+
+function addClient(client) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: '../api/clients',
+      type: 'post',
+      data: {
+        customerId: client.customerId,
+        fullName: client.fullName,
+        credit: 0,
+        last_lesson_date: client.start
+      },
+      dataType: 'json',
+      success: function(response) {
+        resolve(response);
+      },
+      error: function(err) {
+        console.log(err);
+        reject(err);
+      }
+    });
+  });
 }
 
 Date.prototype.toDateInputValue = (function() {

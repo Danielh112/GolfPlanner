@@ -1,14 +1,11 @@
-const mongodb = require('mongodb')
 const express = require('express');
 const router = express.Router();
-const MongoClient = require('mongodb').MongoClient;
-const mongoDBConnection = require('./mongoDBConnection.js');
+const postgres = require('./postgresConnection.js');
 const config = require('../config/config');
 const connectionDetails = config.connectionDetails;
 const qs = require('querystring');
 
 router.post('/addEvent', async (req, res, next) => {
-
   let body = '';
   req.on('data', function(data) {
     body += data;
@@ -18,27 +15,16 @@ router.post('/addEvent', async (req, res, next) => {
   });
   req.on('end', async function() {
 
-    let query = qs.parse(body);
-
-    const client = await mongoDBConnection.establishConn();
-    const db = client.db(connectionDetails.database);
-
-    let event = {
-      title: query.title,
-      lessonType: query.lessonType,
-      start: query.start,
-      end: query.end
+    const qp = qs.parse(body);
+    const query = {
+      text: 'INSERT INTO calendar(full_name, lesson_type, start_date, end_date) VALUES($1, $2, $3, $4) RETURNING customed_id AS customerId',
+      values: [qp.fullName, qp.eventType, qp.start, qp.end],
     }
 
-    db.collection(connectionDetails.calendarCollection).insertOne(event, function(err, result) {
-      if (err) {
-        next(err);
-      } else {
-        console.log('Event Added between ' + query.start + ' and ' + query.end);
-        res.status(200).send({
-          response: result
-        });
-      }
+    const result = await postgres.query(query, next);
+    console.log('Event Added between ' + qp.start + ' and ' + qp.end);
+    res.status(200).send({
+      response: result
     });
   });
 });
@@ -46,25 +32,15 @@ router.post('/addEvent', async (req, res, next) => {
 /* Retrieve calendar events */
 router.get('/', async (req, res, next) => {
   console.log('Retrieving calendar events between ' + req.query.start + ' and ' + req.query.end);
-  const client = await mongoDBConnection.establishConn();
-  const db = client.db(connectionDetails.database);
-  /* Same format as full calendar API */
-  db.collection(connectionDetails.calendarCollection).find({
-    $and: [ {
-      'start': {
-      $gte: req.query.start}
-    },
-    {
-      'end': {
-        $lt: req.query.end,
-      }
-    }]
-  }).toArray(function(err, result) {
-    if (err) throw err;
-    res.status(200).send(
-      result
-    );
-  });
+  const query = {
+    text: 'SELECT full_name AS title, lesson_type, start_date as start, end_date as end FROM calendar WHERE (start_date, end_date) OVERLAPS ($1::TIMESTAMP, $2::TIMESTAMP)',
+    values: [req.query.start, req.query.end],
+  }
+
+  const result = await postgres.query(query, next);
+  res.status(200).send(
+    result.rows
+  );
 });
 
 module.exports = {
